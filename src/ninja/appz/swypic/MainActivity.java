@@ -45,27 +45,35 @@ public class MainActivity extends ListActivity {
 
     // Hashmap for ListView
     ArrayList<HashMap<String, String>> postsList;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         postsList = new ArrayList<HashMap<String, String>>();
-        /*ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-      */
 
+       
+
+        // Calling async task to get json
         new GetPosts().execute();
-
     }
 
     /**
      * Async task class to get json by making HTTP call
      * */
-    @SuppressWarnings("serial")
-	private class GetPosts extends AsyncTask<Void, Void, Void> implements java.io.Serializable {
+    private class GetPosts extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
 
         @Override
         protected Void doInBackground(Void... arg0) {
@@ -148,6 +156,8 @@ public class MainActivity extends ListActivity {
 		
 	}
 
+
+	
 	@SuppressWarnings("unchecked")
 	void load() throws IOException, ClassNotFoundException {
 		
