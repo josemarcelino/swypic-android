@@ -2,17 +2,24 @@ package ninja.appz.swypic;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+/*import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;*/
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,23 +29,23 @@ public class MainActivity extends ListActivity {
 
     // URL to get cocktails JSON
     private static String url = "http://appzninja.io/swypic/api/populate.json";
-
+    
     // JSON Node names
     private static final String TAG_POSTS = "posts";
     private static final String TAG_ID = "id";
     private static final String TAG_PHOTO = "photoUrl";
     private static final String TAG_DESC = "desc";
     private static final String TAG_DATE = "createdDate";
-    private static final String TAG_UP = "upVote";
+   /* private static final String TAG_UP = "upVote";
     private static final String TAG_DOWN = "downVote";
-    private static final String TAG_TIMER = "timer";
+    private static final String TAG_TIMER = "timer";*/
 
     // posts JSONArray
     JSONArray posts = null;
 
     // Hashmap for ListView
     ArrayList<HashMap<String, String>> postsList;
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +53,7 @@ public class MainActivity extends ListActivity {
 
         postsList = new ArrayList<HashMap<String, String>>();
 
-        ListView lv = getListView();
+       
 
         // Calling async task to get json
         new GetPosts().execute();
@@ -135,4 +142,33 @@ public class MainActivity extends ListActivity {
         }
 
     }
+
+	void save() throws IOException {
+		
+			FileOutputStream postsFOS = new FileOutputStream("voted.tmp");
+			ObjectOutputStream postsOOS = new ObjectOutputStream(postsFOS);
+
+			for(HashMap<String, String> u: postsList)
+			{
+				postsOOS.writeObject(u);
+			}
+			postsOOS.close();
+		
+	}
+
+
+	
+	@SuppressWarnings("unchecked")
+	void load() throws IOException, ClassNotFoundException {
+		
+			FileInputStream postsFIS = new FileInputStream("voted.tmp");
+			ObjectInputStream postsOIS = new ObjectInputStream(postsFIS);
+			while(postsFIS.available() > 0)
+			{
+				postsList.add((HashMap<String, String>)postsOIS.readObject());
+			}
+
+			postsOIS.close();
+	}
+	
 }
